@@ -140,8 +140,8 @@ WebCLGLUtils.prototype.createShader = function(name, sourceVertex, sourceFragmen
 
 /**
 * Get Uint8Array from HTMLImageElement
-* @returns {HTMLImageElement}
-* @param {HTMLCanvasElement} imageElement
+* @returns {Uint8Array}
+* @param {HTMLImageElement} imageElement
 */
 WebCLGLUtils.prototype.getUint8ArrayFromHTMLImageElement = function(imageElement) {
 	var e = document.createElement('canvas');

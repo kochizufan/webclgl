@@ -47,7 +47,8 @@ WebCLGL = function(webglcontext) {
 			}
 		}
 	} else this.gl = webglcontext; 
-	this.floatSupport = this.gl.getExtension('OES_texture_float') ? true : false;
+	this.gl.getExtension('OES_texture_float') ? true : false;
+	this.gl.getExtension('OES_texture_float_linear') ? true : false;
 	var highPrecisionSupport = this.gl.getShaderPrecisionFormat(this.gl.FRAGMENT_SHADER, this.gl.HIGH_FLOAT);
 	this.precision = (highPrecisionSupport != 0) ? 'precision highp float;\n\n' : 'precision mediump float;\n\n';
 	
@@ -191,13 +192,15 @@ WebCLGL.prototype.copy = function(valueToRead, valueToWrite) {
 };
 /**
 * Create a empty WebCLGLBuffer 
-* @param {Int} length
+* @param {Int} length Length of buffer. 
+* @param {Array<Float>} length Array with width and height values if is for a WebGLTexture
 * @param {String} [type="FLOAT"] type FLOAT or FLOAT4
 * @param {Int} [offset=0] If 0 the range is from 0.0 to 1.0 else if >0 then the range is from -offset.0 to offset.0
+* @property {Bool} [linear=false] linear texParameteri type for the WebGLTexture
 * @returns {WebCLGLBuffer} 
 */
-WebCLGL.prototype.createBuffer = function(length, type, offset) {	
-	var webclglBuffer = new WebCLGLBuffer(this.gl, length);	
+WebCLGL.prototype.createBuffer = function(length, type, offset, linear) {	
+	var webclglBuffer = new WebCLGLBuffer(this.gl, length, linear);	  
 	if(type != undefined && type == 'FLOAT4') webclglBuffer.type = 'FLOAT4';
 	if(offset != undefined) webclglBuffer.offset = offset;   
 	

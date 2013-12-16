@@ -30,26 +30,36 @@ THE SOFTWARE.
 * @property {Array<Float>} inData Original array
 * @property {Int} [offset=0] offset of buffer
 */
-WebCLGLBuffer = function(gl, length) { 
+WebCLGLBuffer = function(gl, length, linear) { 
 	this.gl = gl;
-	this.floatSupport = this.gl.getExtension('OES_texture_float') ? true : false;
-	this.W = Math.sqrt(length);
-	this.H = this.W;
+	if(length instanceof Object) { 
+		this.W = length[0];
+		this.H = length[1];
+	} else {
+		this.W = Math.sqrt(length);
+		this.H = this.W;
+	}
 	this.type = 'FLOAT'; // FLOAT OR FLOAT4
 	this.offset = 0;
-	this.utils = new WebCLGLUtils(gl);
+	this.linear = linear;
+	this.utils = new WebCLGLUtils(this.gl);
 	
 	this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, false);
 	this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 	
 	this.textureData = this.gl.createTexture();
 	this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureData);  
-	this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.W,this.H, 0, this.gl.RGBA, this.gl.FLOAT, null);
-	this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE); 
-	
+	if(this.linear != undefined && this.linear) {
+		this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.W,this.H, 0, this.gl.RGBA, this.gl.FLOAT, null); 
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR); 
+	} else {
+		this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.W,this.H, 0, this.gl.RGBA, this.gl.FLOAT, null);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);  
+	} 
 	
 	this.inData;
 	this.outArray4Uint8Array = new Uint8Array((this.W*this.H)*4); 
