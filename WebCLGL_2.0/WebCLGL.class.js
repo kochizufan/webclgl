@@ -261,6 +261,7 @@ WebCLGL.prototype.enqueueWriteBuffer = function(buffer, arr, flip) {
 			}
 		}
 	}
+	if(buffer.linear) this.gl.generateMipmap(this.gl.TEXTURE_2D);
 };
 
 /**
